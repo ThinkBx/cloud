@@ -1,0 +1,32 @@
+# 注册服务的端口
+server:
+  port: 6000
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    # 配置当前服务的名称
+    name: cloud-config
+  profiles:
+    active: native  #配置文件在本地
+  # 分布式配置中心
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/dev
+    # Consul 服务发现
+    consul:
+      host: cloud-consul
+      port: 8500
+      discovery:
+        instance-id: ${spring.application.name}:${server.port}
+        prefer-ip-address: false
+        health-check-interval: 10s
+        hostname: ${spring.application.name}
+        service-name: ${spring.application.name}
+        enabled: true
+#        health-check-url: http://${spring.application.name}:${server.port}/actuator/health # 自定义健康检测路径
+        health-check-path: /actuator/health
+

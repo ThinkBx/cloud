@@ -1,0 +1,23 @@
+server:
+  port: 5012
+spring:
+  application:
+    name: cloud-ucenter
+  cloud:
+    config:
+      fail-fast: true
+      discovery:
+        serviceId: cloud-config
+        enabled: true
+      name: application-common,application-mysql,application-mybatis-plus
+    consul:
+      discovery:
+        instance-id: ${spring.application.name}:${server.port}
+        prefer-ip-address: false
+        health-check-interval: 10s
+        hostname: ${spring.application.name}
+        service-name: ${spring.application.name}
+        enabled: true
+        health-check-path: /actuator/health
+      host: cloud-consul
+      port: 8500

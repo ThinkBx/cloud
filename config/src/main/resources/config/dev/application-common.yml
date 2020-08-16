@@ -1,0 +1,26 @@
+#日志设置TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+logging:
+  level:
+    com: DEBUG
+
+ribbon:
+  MaxConnectionPerHost: 500 #每个host的最大连接数
+  MaxTotalConnections: 2000 #ribbon的最大连接数
+  PoolMaxThreads: 2000 #ribbon的最大工作线程数
+  ReadTimeout:  10000
+  ConnectTimeout:  10000
+  # 对当前实例的重试次数
+  MaxAutoRetries: 1
+  # 切换实例的重试次数
+  MaxAutoRetriesNextServer: 2
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          # 隔离策略（THREAD、SEMAPHORE）
+          strategy: THREAD
+          # 线程超时时间（毫秒）
+          thread:
+            timeoutInMilliseconds: 25000

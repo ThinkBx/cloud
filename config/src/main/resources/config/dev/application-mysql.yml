@@ -1,0 +1,39 @@
+spring:
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  datasource:
+    druid:
+      stat-view-servlet:
+        loginUsername: admin
+        loginPassword: 123456
+    dynamic:
+      primary: master #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #设置严格模式,默认false不启动. 启动后在未匹配到指定数据源时候回抛出异常,不启动会使用默认数据源.
+      druid:
+        driver-class-name: com.mysql.jdbc.Driver
+        maxActive: 20
+        initialSize: 5
+        maxWait: 60000
+        minIdle: 5
+        timeBetweenEvictionRunsMillis: 60000 #设置执行一次连接回收器的时间
+        minEvictableIdleTimeMillis: 300000 #设置时间： 该时间内没有任何操作的空闲连接会被回收
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true # 空闲时校验
+        testOnBorrow: false # 使用中是否校验有效性
+        testOnReturn: false # 归还连接池时是否校验
+        poolPreparedStatements: true  # mysql 不推荐打开预处理连接池
+        maxOpenPreparedStatements: 20
+        filters: stat,wall,slf4j # 注意这个值和druid原生不一致，默认启动了stat,wall #stat,logback
+        userGlobalataSourceStat: true  # 统计所有数据源状态
+        connectionProperties: druid.stat.mergSql=true;druid.stat.slowSqlMillis=500  # sql合并统计 设置慢sql时间为500，超过500 会有记录提示
+      datasource:
+        master:
+          driver-class-name: com.mysql.jdbc.Driver
+          url: jdbc:mysql://cloud-mysql:3306/cloud?useUnicode=true&characterEncoding=utf-8
+          username: root
+          password:
+        slave:
+          username: root
+          password:
+          driver-class-name: com.mysql.jdbc.Driver
+          url: jdbc:mysql://cloud-mysql:3306/cloud?useUnicode=true&characterEncoding=utf-8

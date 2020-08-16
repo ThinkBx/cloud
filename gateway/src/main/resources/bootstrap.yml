@@ -1,0 +1,60 @@
+server:
+  port: 5010
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000  #tomcat接受排队的最大数量
+    max-threads: 1000   #tomcat工作线程数量
+    max-connections: 2000 #tomcat处理的最大连接数
+spring:
+  application:
+    # 配置当前服务的名称
+    name: cloud-gateway
+  # 分布式配置中心
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: cloud-config
+      # 读取分布式配置中心配置文件
+      name: application-common
+    # Consul 服务发现
+    consul:
+      host: cloud-consul
+      port: 8500
+      discovery:
+        instance-id: ${spring.application.name}:${server.port}
+        prefer-ip-address: false
+        health-check-interval: 10s
+        hostname: ${spring.application.name}
+        service-name: ${spring.application.name}
+        enabled: true
+        health-check-path: /actuator/health
+    gateway:
+      routes:
+
+        # 鉴权
+        - id: auth
+          uri: lb://cloud-auth/auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forword:/defaultFallback
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@ipKeyResolver}'     #使用的Bean名称，规则为按名称引用Bean
+                redis-rate-limiter.replenishRate: 200 #允许用户每秒处理的请求个数
+                redis-rate-limiter.burstCapacity: 400 #令牌桶的容量，允许在一秒内完成的最大请求数
+
+        # 用户中心
+        - id: user
+          uri: lb://cloud-user/user
+          predicates:
+            - Path=/user/**
+  redis:
+    host: cloud-redis
+    port: 6379
+    password:
+
